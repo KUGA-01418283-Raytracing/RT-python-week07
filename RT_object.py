@@ -43,8 +43,22 @@ class Sphere(Object):
         hit_point = rRay.at(root)
         hit_normal = (hit_point - self.center) / self.radius
         hinfo = rtu.Hitinfo(hit_point, hit_normal, hit_t, self.material)
-        hinfo.set_face_normal(rRay, hit_normal) 
+        hinfo.set_face_normal(rRay, hit_normal)
+
+        # set uv coordinates for texture mapping
+        fuv = self.get_uv(hit_normal)
+        hinfo.set_uv(fuv[0], fuv[1])
+
         return hinfo
+
+    # return uv coordinates of the sphere at the hit point.
+    def get_uv(self, vNormal):
+        theta = math.acos(-vNormal.y())
+        phi = math.atan2(-vNormal.z(), vNormal.x()) + math.pi
+
+        u = phi / (2*math.pi)
+        v = theta / math.pi
+        return (u,v)
 
 # Ax + By + Cz = D
 class Quad(Object):
@@ -62,7 +76,6 @@ class Quad(Object):
     def add_material(self, mMat):
         self.material = mMat
 
-    # Assignment 3
     def intersect(self, rRay, cInterval):
         denom = rtu.Vec3.dot_product(self.normal, rRay.getDirection())
         # if parallel
@@ -87,6 +100,10 @@ class Quad(Object):
 
         hinfo = rtu.Hitinfo(hit_point, hit_normal, hit_t, self.material)
         hinfo.set_face_normal(rRay, hit_normal)
+
+        # set uv coordinates for texture mapping
+        hinfo.set_uv(alpha, beta)
+
         return hinfo
     
     def is_interior(self, fa, fb):

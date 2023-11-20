@@ -1,2 +1,4 @@
 
 solution.txt
+*.pyc
+*.png

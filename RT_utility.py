@@ -143,6 +143,9 @@ class Hitinfo:
         self.t = fT
         self.front_face = True
         self.mat = mMat
+        # handling texture
+        self.u = 0.0
+        self.v = 0.0
         pass
 
     def set_face_normal(self, vRay, outwardNormal):
@@ -152,6 +155,11 @@ class Hitinfo:
         else:
             self.normal = -outwardNormal
         pass
+
+    # set uv coordinates of the hit point.
+    def set_uv(self, fu, fv):
+        self.u = fu
+        self.v = fv
 
     def getT(self):
         return self.t
@@ -164,6 +172,9 @@ class Hitinfo:
     
     def getMaterial(self):
         return self.mat
+    
+    def getUV(self):
+        return (self.u, self.v)
     
 class Interval:
     def __init__(self, minval, maxval) -> None:
