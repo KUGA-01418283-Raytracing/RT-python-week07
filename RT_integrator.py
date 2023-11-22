@@ -29,7 +29,6 @@ class Integrator():
                 return hmat.emitting()
 
 
-            # Class assignemnt (1.)
             Le = rtu.Color()
             # if direct lighting is enabled
             if self.bool_direct_lighting:
@@ -48,6 +47,6 @@ class Integrator():
             # return the color
             return Le + self.compute_scattering(rtr.Ray(hinfo.getP(), sinfo.scattered_ray.getDirection()), scene, maxDepth-1) * sinfo.attenuation_color
 
-        return scene.get_sky_background_color(rGen_ray)
-        # return scene.getBackgroundColor()
+        # return scene.get_sky_background_color(rGen_ray)
+        return scene.getBackgroundColor()
 

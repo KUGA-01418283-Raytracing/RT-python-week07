@@ -87,6 +87,28 @@ class Dielectric(Material):
         # return scattering info
         return rtu.Scatterinfo(scattered_ray, attenuation_color)
 
+# A metal class with roughness parameter
+class Metal(Material):
+    def __init__(self, cAlbedo, fRoughness) -> None:
+        super().__init__()
+        self.color_albedo = rtu.Color(cAlbedo.r(), cAlbedo.g(), cAlbedo.b())
+        self.roughness = fRoughness
+        if self.roughness > 1.0:
+            self.roughness = 1.0
+
+    def scattering(self, rRayIn, hHinfo):
+        # compute scattered ray based on the roughtness parameter
+        reflected_direction = reflect(rtu.Vec3.unit_vector(rRayIn.getDirection()), hHinfo.getNormal()) + rtu.Vec3.random_vec3_unit()*self.roughness
+        reflected_ray = rtr.Ray(hHinfo.getP(), reflected_direction)
+        attenuation_color = rtu.Color(self.color_albedo.r(), self.color_albedo.g(), self.color_albedo.b())
+
+        # check if the reflected direction is below the surface normal
+        if rtu.Vec3.dot_product(reflected_direction, hHinfo.getNormal()) <= 1e-8:
+            attenuation_color = rtu.Color(0,0,0)
+
+        return rtu.Scatterinfo(reflected_ray, attenuation_color)
+
+
 # a texture
 class TextureColor(Material):
     def __init__(self, color_or_texture) -> None:
@@ -106,4 +128,45 @@ class TextureColor(Material):
 
         return rtu.Scatterinfo(scattered_ray, attenuation_color)
     
+
+# Phong reflection model
+class Phong(Material):
+    def __init__(self, cAlbedo, kd, ks, fRoughness) -> None:
+        super().__init__()
+        self.color_albedo = rtu.Color(cAlbedo.r(), cAlbedo.g(), cAlbedo.b())
+        self.kd = kd
+        self.ks = ks
+        self.roughness = fRoughness
+
+    def scattering(self, rRayIn, hHinfo):
+        # compute scattered ray based on the roughtness parameter
+        
+        reflected_direction = hHinfo.getNormal() + rtu.Vec3.random_vec3_unit()
+        if reflected_direction.near_zero():
+            reflected_direction = hHinfo.getNormal()
+
+        reflected_ray = rtr.Ray(hHinfo.getP(), reflected_direction)
+        # check if the reflected direction is below the surface normal
+        if rtu.Vec3.dot_product(reflected_direction, hHinfo.getNormal()) <= 1e-8:
+            attenuation_color = rtu.Color(0,0,0)
+        
+        # calculate diffuse color
+        diff_color = rtu.Color(self.color_albedo.r(), self.color_albedo.g(), self.color_albedo.b())*self.kd
+
+        # calculate specular color
+        perfect_reflection = reflect(rtu.Vec3.unit_vector(reflected_direction), hHinfo.getNormal())
+        R_dot_V = math.fabs(rtu.Vec3.dot_product(perfect_reflection, rRayIn.getDirection()))
+        spec_color = rtu.Color(self.color_albedo.r(), self.color_albedo.g(), self.color_albedo.b())*self.ks*math.pow(R_dot_V, self.roughness)
+
+        # calculate final color = diffuse color + specular color
+        phong_color = diff_color + spec_color
+
+        # clamping
+        r = rtu.Interval(0,1).clamp(phong_color.r())
+        g = rtu.Interval(0,1).clamp(phong_color.g())
+        b = rtu.Interval(0,1).clamp(phong_color.b())
+        attenuation_color = rtu.Color(r, g, b)
+
+
+        return rtu.Scatterinfo(reflected_ray, attenuation_color)
 
