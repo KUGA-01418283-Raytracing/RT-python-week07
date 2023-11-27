@@ -102,7 +102,6 @@ class Quad(Object):
         hinfo.set_face_normal(rRay, hit_normal)
 
         # set uv coordinates for texture mapping
-        hinfo.set_uv(alpha, beta)
 
         return hinfo
     
