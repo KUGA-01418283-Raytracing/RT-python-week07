@@ -23,7 +23,7 @@ The codes were rewritten and modified from https://raytracing.github.io/books/Ra
 4. Complete the metal class in RT_material.py. The reflected ray must be calculated based on the roughness parameter.
 5. Submit the rendered result from (3.). by setting up a scene with 6 matal balls. The submitted file name is 'week07_metal_balls.png'. The parameters are as follows.
     5.1 Roughness paramters = 0.0001, 0.0005, 0.05, 0.1, 0.8, 1.0. 
-    5.2 Use a quad a light source above all of the balls.
+    5.2 Use a quad(area) light source above all of the balls.
     5.3 The background is almost black.
     5.4 number of samples per pixel = 256
     5.5 max depth = 7
